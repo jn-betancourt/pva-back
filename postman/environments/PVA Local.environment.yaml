@@ -1,0 +1,16 @@
+name: PVA Local
+values:
+  - key: base_url
+    value: 'http://localhost:8080'
+  - key: token
+    value: ''
+  - key: id_operario
+    value: ''
+  - key: id_turno
+    value: ''
+  - key: id_categoria
+    value: ''
+  - key: id_producto
+    value: ''
+  - key: codigo_barras
+    value: ''

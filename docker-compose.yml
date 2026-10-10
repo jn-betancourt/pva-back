@@ -1,0 +1,17 @@
+services:
+  pva-db:
+    image: mysql:8.0
+    container_name: pva-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: pva
+      MYSQL_USER: pva
+      MYSQL_PASSWORD: ${DB_PASSWORD:-pva_password}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-pva_root_password}
+    ports:
+      - "3306:3306"
+    volumes:
+      - pva-db-data:/var/lib/mysql
+
+volumes:
+  pva-db-data:

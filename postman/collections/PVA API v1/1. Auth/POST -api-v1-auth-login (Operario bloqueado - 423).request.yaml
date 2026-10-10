@@ -1,0 +1,79 @@
+$kind: http-request
+name: POST /api/v1/auth/login (Operario bloqueado - 423)
+url: "{{base_url}}/api/v1/auth/login"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "nombre_usuario": "{{usuario_bloqueado}}",
+      "pin": "0000"
+    }
+scripts:
+  - type: beforeRequest
+    code: |-
+      const baseUrl = pm.environment.get("base_url") || "http://localhost:8080";
+      const token = pm.environment.get("token");
+      const rand = Math.floor(Math.random() * 1000000);
+      const username = "cajero_bloq_" + rand;
+      pm.variables.set("usuario_bloqueado", username);
+
+      // Crear operario temporal y bloquearlo con 3 intentos fallidos
+      pm.sendRequest({
+          url: baseUrl + '/api/v1/operarios',
+          method: 'POST',
+          header: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + token
+          },
+          body: {
+              mode: 'raw',
+              raw: JSON.stringify({
+                  nombre_completo: "Cajero Para Bloquear",
+                  numero_documento: "DOC_" + rand,
+                  telefono: "3000000000",
+                  nombre_usuario: username,
+                  pin: "1111",
+                  rol: "CAJERO"
+              })
+          }
+      }, function (err, res) {
+          if (!err && (res.code === 201 || res.code === 200)) {
+              const sendErr = (count) => {
+                  pm.sendRequest({
+                      url: baseUrl + '/api/v1/auth/login',
+                      method: 'POST',
+                      header: { 'Content-Type': 'application/json' },
+                      body: {
+                          mode: 'raw',
+                          raw: JSON.stringify({ nombre_usuario: username, pin: '0000' })
+                      }
+                  }, function (e, r) {
+                      if (count > 1) {
+                          sendErr(count - 1);
+                      }
+                  });
+              };
+              sendErr(3);
+          }
+      });
+    language: text/javascript
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 423 Locked", function () {
+          pm.response.to.have.status(423);
+      });
+      pm.test("Tiempo de respuesta < 1500 ms (RNF-01)", function () {
+          pm.expect(pm.response.responseTime).to.be.below(1500);
+      });
+      const jsonData = pm.response.json();
+      pm.test("Estructura de error estándar y código AUTH-OPERARIO-BLOQUEADO", function () {
+          pm.expect(jsonData).to.have.property("error");
+          pm.expect(jsonData).to.have.property("codigo");
+          pm.expect(jsonData).to.have.property("detalle");
+          pm.expect(jsonData.codigo).to.eql("AUTH-OPERARIO-BLOQUEADO");
+      });
+    language: text/javascript
+order: 3000

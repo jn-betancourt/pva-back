@@ -1,0 +1,21 @@
+$kind: http-request
+name: GET /api/v1/productos/{{id_producto}}
+url: "{{base_url}}/api/v1/productos/{{id_producto}}"
+method: GET
+headers:
+  Authorization: Bearer {{token}}
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 200", function () {
+          pm.response.to.have.status(200);
+      });
+      pm.test("Tiempo de respuesta < 1500 ms (RNF-01)", function () {
+          pm.expect(pm.response.responseTime).to.be.below(1500);
+      });
+      const jsonData = pm.response.json();
+      pm.test("Detalle de producto coincide con id_producto", function () {
+          pm.expect(jsonData.id_producto).to.eql(Number(pm.environment.get("id_producto")));
+      });
+    language: text/javascript
+order: 3000

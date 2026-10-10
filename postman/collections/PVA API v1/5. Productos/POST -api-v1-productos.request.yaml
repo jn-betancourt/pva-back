@@ -1,0 +1,48 @@
+$kind: http-request
+name: POST /api/v1/productos
+url: "{{base_url}}/api/v1/productos"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{token}}
+body:
+  type: json
+  content: |-
+    {
+      "codigo_barras": "{{nuevo_barcode}}",
+      "nombre": "{{producto_nombre}}",
+      "descripcion": "Producto para pruebas unitarias y de integración Postman",
+      "id_categoria": {{id_categoria}},
+      "precio_venta": 4500.00,
+      "costo_inicial": 2500.00,
+      "stock_inicial": 50,
+      "aplica_iva": true,
+      "porcentaje_iva": 19.00,
+      "stock_minimo": 10,
+      "unidad_medida": "UNIDAD"
+    }
+scripts:
+  - type: beforeRequest
+    code: |-
+      const rand = Math.floor(Math.random() * 1000000);
+      pm.variables.set("producto_nombre", "Producto Test " + rand);
+      pm.variables.set("nuevo_barcode", "770" + String(rand).padStart(10, '0'));
+    language: text/javascript
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 201 Created", function () {
+          pm.response.to.have.status(201);
+      });
+      pm.test("Tiempo de respuesta < 1500 ms (RNF-01)", function () {
+          pm.expect(pm.response.responseTime).to.be.below(1500);
+      });
+      const jsonData = pm.response.json();
+      pm.test("Producto creado con id_producto y codigo_barras", function () {
+          pm.expect(jsonData.id_producto).to.be.a("number");
+          pm.expect(jsonData.stock_actual).to.eql(50);
+          pm.expect(jsonData.activo).to.eql(true);
+      });
+      pm.environment.set("id_producto", jsonData.id_producto);
+      pm.environment.set("codigo_barras", jsonData.codigo_barras);
+    language: text/javascript
+order: 1000

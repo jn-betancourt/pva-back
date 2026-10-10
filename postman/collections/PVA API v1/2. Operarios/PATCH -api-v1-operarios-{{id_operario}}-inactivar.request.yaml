@@ -1,0 +1,21 @@
+$kind: http-request
+name: PATCH /api/v1/operarios/{{id_operario}}/inactivar
+url: "{{base_url}}/api/v1/operarios/{{id_operario}}/inactivar"
+method: PATCH
+headers:
+  Authorization: Bearer {{token}}
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 200", function () {
+          pm.response.to.have.status(200);
+      });
+      pm.test("Tiempo de respuesta < 1500 ms (RNF-01)", function () {
+          pm.expect(pm.response.responseTime).to.be.below(1500);
+      });
+      const jsonData = pm.response.json();
+      pm.test("Operario marcado como inactivo (activo=false)", function () {
+          pm.expect(jsonData.activo).to.eql(false);
+      });
+    language: text/javascript
+order: 7000

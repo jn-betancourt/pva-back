@@ -1,0 +1,36 @@
+$kind: http-request
+name: PUT /api/v1/productos/{{id_producto}}
+url: "{{base_url}}/api/v1/productos/{{id_producto}}"
+method: PUT
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{token}}
+body:
+  type: json
+  content: |-
+    {
+      "codigo_barras": "{{codigo_barras}}",
+      "nombre": "Producto Actualizado {{id_producto}}",
+      "descripcion": "Descripción actualizada de producto vía Postman",
+      "id_categoria": {{id_categoria}},
+      "precio_venta": 4800.00,
+      "aplica_iva": true,
+      "porcentaje_iva": 19.00,
+      "stock_minimo": 8,
+      "unidad_medida": "UNIDAD"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 200", function () {
+          pm.response.to.have.status(200);
+      });
+      pm.test("Tiempo de respuesta < 1500 ms (RNF-01)", function () {
+          pm.expect(pm.response.responseTime).to.be.below(1500);
+      });
+      const jsonData = pm.response.json();
+      pm.test("Precio de venta actualizado", function () {
+          pm.expect(jsonData.precio_venta).to.eql(4800.00);
+      });
+    language: text/javascript
+order: 5000

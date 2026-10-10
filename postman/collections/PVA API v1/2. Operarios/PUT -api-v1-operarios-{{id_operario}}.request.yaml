@@ -1,0 +1,31 @@
+$kind: http-request
+name: PUT /api/v1/operarios/{{id_operario}}
+url: "{{base_url}}/api/v1/operarios/{{id_operario}}"
+method: PUT
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{token}}
+body:
+  type: json
+  content: |-
+    {
+      "nombre_completo": "Cajero Nombre Modificado",
+      "telefono": "3119876543",
+      "nombre_usuario": null,
+      "rol": "CAJERO"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 200", function () {
+          pm.response.to.have.status(200);
+      });
+      pm.test("Tiempo de respuesta < 1500 ms (RNF-01)", function () {
+          pm.expect(pm.response.responseTime).to.be.below(1500);
+      });
+      const jsonData = pm.response.json();
+      pm.test("Nombre completo fue actualizado", function () {
+          pm.expect(jsonData.nombre_completo).to.eql("Cajero Nombre Modificado");
+      });
+    language: text/javascript
+order: 4000
