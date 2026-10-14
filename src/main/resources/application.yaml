@@ -2,7 +2,7 @@ spring:
   application:
     name: app
   datasource:
-    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:pva}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3307}/${DB_NAME:pva}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: ${DB_USER:pva}
     password: ${DB_PASSWORD:pva_password}
     driver-class-name: com.mysql.cj.jdbc.Driver

@@ -9,7 +9,7 @@ services:
       MYSQL_PASSWORD: ${DB_PASSWORD:-pva_password}
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-pva_root_password}
     ports:
-      - "3306:3306"
+      - "${DB_PORT:-3307}:3306"
     volumes:
       - pva-db-data:/var/lib/mysql
 

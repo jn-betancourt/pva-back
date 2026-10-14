@@ -1,0 +1,32 @@
+$kind: http-request
+name: PATCH /api/v1/ventas/{{id_venta}}/anular
+url: "{{base_url}}/api/v1/ventas/{{id_venta}}/anular"
+method: PATCH
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{token}}
+body:
+  type: json
+  content: |-
+    {
+      "motivo_anulacion": "Error de digitación en mostrador",
+      "pin": "1234"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 200 OK", function () {
+          pm.response.to.have.status(200);
+      });
+      pm.test("Tiempo de respuesta < 1500 ms (RNF-01)", function () {
+          pm.expect(pm.response.responseTime).to.be.below(1500);
+      });
+      const jsonData = pm.response.json();
+      pm.test("Venta anulada y stock reintegrado (US-16, RN-VTA-05)", function () {
+          pm.expect(jsonData.estado).to.eql("ANULADA");
+          pm.expect(jsonData.factura.estado).to.eql("ANULADA");
+          pm.expect(jsonData.factura.motivo_anulacion).to.eql("Error de digitación en mostrador");
+          pm.expect(jsonData.mensaje).to.include("Venta anulada correctamente");
+      });
+    language: text/javascript
+order: 4000

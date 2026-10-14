@@ -1,0 +1,53 @@
+$kind: http-request
+name: POST /api/v1/ventas
+url: "{{base_url}}/api/v1/ventas"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{token}}
+body:
+  type: json
+  content: |-
+    {
+      "uuid_offline": null,
+      "id_turno": {{id_turno}},
+      "items": [
+        {
+          "id_producto": {{id_producto}},
+          "cantidad": 1,
+          "descuento_linea": 0.00
+        }
+      ],
+      "descuento_global": 0.00,
+      "medio_pago": "EFECTIVO",
+      "monto_recibido": 5000.00,
+      "referencia_pago": null,
+      "cliente": {
+        "identificacion": "123456789",
+        "nombre": "Carlos Perez",
+        "direccion": "Calle 10 # 5-20",
+        "telefono": "3001234567"
+      }
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 201 Created", function () {
+          pm.response.to.have.status(201);
+      });
+      pm.test("Tiempo de respuesta < 1500 ms (RNF-01)", function () {
+          pm.expect(pm.response.responseTime).to.be.below(1500);
+      });
+      const jsonData = pm.response.json();
+      pm.test("Venta confirmada y factura correlativa generada (US-14, US-15)", function () {
+          pm.expect(jsonData.estado).to.eql("CONFIRMADA");
+          pm.expect(jsonData.id_venta).to.be.a("number");
+          pm.expect(jsonData.total_a_pagar).to.be.a("number");
+          pm.expect(jsonData.cambio_entregado).to.be.a("number");
+          pm.expect(jsonData.factura).to.be.an("object");
+          pm.expect(jsonData.factura.numero_ticket).to.match(/^POS-\d{6}$/);
+          pm.environment.set("id_venta", jsonData.id_venta);
+          pm.environment.set("id_factura", jsonData.factura.id_factura);
+      });
+    language: text/javascript
+order: 1000

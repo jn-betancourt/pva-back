@@ -1,0 +1,29 @@
+$kind: http-request
+name: GET /api/v1/inventario/kardex/{{id_producto}}
+url: "{{base_url}}/api/v1/inventario/kardex/{{id_producto}}"
+method: GET
+headers:
+  Authorization: Bearer {{token}}
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 200 OK", function () {
+          pm.response.to.have.status(200);
+      });
+      pm.test("Tiempo de respuesta < 1500 ms (RNF-01)", function () {
+          pm.expect(pm.response.responseTime).to.be.below(1500);
+      });
+      const jsonData = pm.response.json();
+      pm.test("Kardex inmutable append-only retornado (US-11, RN-INV-06)", function () {
+          pm.expect(jsonData.id_producto).to.eql(Number(pm.environment.get("id_producto")));
+          pm.expect(jsonData.movimientos).to.be.an("array");
+          if (jsonData.movimientos.length > 0) {
+              const m = jsonData.movimientos[0];
+              pm.expect(m).to.have.property("tipo_movimiento");
+              pm.expect(m).to.have.property("cantidad");
+              pm.expect(m).to.have.property("costo_unitario");
+              pm.expect(m).to.have.property("saldo_resultante");
+          }
+      });
+    language: text/javascript
+order: 4000

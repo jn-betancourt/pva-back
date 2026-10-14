@@ -34,6 +34,37 @@ public class InventarioController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @PostMapping("/ajuste")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<com.pva.app.dto.response.AjusteInventarioResponse> registrarAjuste(
+            @Valid @RequestBody com.pva.app.dto.request.RegistrarAjusteRequest request,
+            Authentication authentication) {
+        Long idOperario = extraerIdOperario(authentication);
+        return ResponseEntity.status(HttpStatus.CREATED).body(inventarioService.registrarAjuste(request, idOperario));
+    }
+
+    @org.springframework.web.bind.annotation.GetMapping("/kardex/{id_producto}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<com.pva.app.dto.response.KardexResponse> obtenerKardex(
+            @org.springframework.web.bind.annotation.PathVariable("id_producto") Long idProducto,
+            @org.springframework.web.bind.annotation.RequestParam(value = "desde", required = false)
+            @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME)
+            java.time.LocalDateTime desde,
+            @org.springframework.web.bind.annotation.RequestParam(value = "hasta", required = false)
+            @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME)
+            java.time.LocalDateTime hasta,
+            @org.springframework.web.bind.annotation.RequestParam(value = "tipo", required = false)
+            com.pva.app.domain.TipoMovimientoInventario tipo) {
+        return ResponseEntity.ok(inventarioService.obtenerKardex(idProducto, desde, hasta, tipo));
+    }
+
+    @org.springframework.web.bind.annotation.GetMapping("/alertas")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<java.util.List<com.pva.app.dto.response.AlertaStockResponse>> listarAlertas() {
+        return ResponseEntity.ok(inventarioService.listarAlertas());
+    }
+
+
     private Long extraerIdOperario(Authentication authentication) {
         if (authentication == null || authentication.getPrincipal() == null) {
             throw new AppException("Token inválido o expirado", HttpStatus.UNAUTHORIZED, "AUTH-TOKEN-INVALIDO");

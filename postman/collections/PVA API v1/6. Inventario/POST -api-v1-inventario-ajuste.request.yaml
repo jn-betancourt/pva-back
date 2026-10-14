@@ -1,0 +1,36 @@
+$kind: http-request
+name: POST /api/v1/inventario/ajuste
+url: "{{base_url}}/api/v1/inventario/ajuste"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{token}}
+body:
+  type: json
+  content: |-
+    {
+      "id_producto": {{id_producto}},
+      "tipo_movimiento": "AJUSTE_SALIDA",
+      "cantidad": 1,
+      "costo_unitario": 2500.00,
+      "motivo_ajuste": "Frasco roto en estantería",
+      "id_referencia": "ACTA-MERMA-001"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 201 Created", function () {
+          pm.response.to.have.status(201);
+      });
+      pm.test("Tiempo de respuesta < 1500 ms (RNF-01)", function () {
+          pm.expect(pm.response.responseTime).to.be.below(1500);
+      });
+      const jsonData = pm.response.json();
+      pm.test("Ajuste registrado en Kardex (US-10, RN-INV-05)", function () {
+          pm.expect(jsonData.tipo_movimiento).to.eql("AJUSTE_SALIDA");
+          pm.expect(jsonData.id_producto).to.eql(Number(pm.environment.get("id_producto")));
+          pm.expect(jsonData.motivo_ajuste).to.eql("Frasco roto en estantería");
+          pm.expect(jsonData.saldo_resultante).to.be.a("number");
+      });
+    language: text/javascript
+order: 3000
