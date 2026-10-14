@@ -14,7 +14,6 @@ import com.pva.app.dto.request.*;
 import com.pva.app.dto.response.*;
 import com.pva.app.repository.ProductoRepository;
 import com.pva.app.repository.ProductoSpecifications;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,13 +25,22 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class ProductoService {
 
     private final ProductoRepository productoRepository;
     private final CategoriaRepository categoriaRepository;
     private final MovimientoInventarioRepository movimientoInventarioRepository;
     private final OperarioRepository operarioRepository;
+
+    public ProductoService(ProductoRepository productoRepository,
+                           CategoriaRepository categoriaRepository,
+                           MovimientoInventarioRepository movimientoInventarioRepository,
+                           OperarioRepository operarioRepository) {
+        this.productoRepository = productoRepository;
+        this.categoriaRepository = categoriaRepository;
+        this.movimientoInventarioRepository = movimientoInventarioRepository;
+        this.operarioRepository = operarioRepository;
+    }
 
     @Transactional
     public CrearProductoResponse crear(CrearProductoRequest request, Long idOperarioAdmin) {

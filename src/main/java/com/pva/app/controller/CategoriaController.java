@@ -6,7 +6,6 @@ import com.pva.app.dto.request.CrearCategoriaRequest;
 import com.pva.app.dto.response.InactivarCategoriaResponse;
 import com.pva.app.service.CategoriaService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,10 +15,13 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/categorias")
-@RequiredArgsConstructor
 public class CategoriaController {
 
     private final CategoriaService categoriaService;
+
+    public CategoriaController(CategoriaService categoriaService) {
+        this.categoriaService = categoriaService;
+    }
 
     @GetMapping
     @PreAuthorize("hasAnyRole('CAJERO', 'ADMIN')")

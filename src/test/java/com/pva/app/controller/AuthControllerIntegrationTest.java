@@ -14,7 +14,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -74,7 +73,7 @@ class AuthControllerIntegrationTest {
     @Test
     @DisplayName("US-01 BDD 2: Login con PIN incorrecto retorna 401 AUTH-PIN-INCORRECTO y decrementa restantes")
     void testLoginPinIncorrecto() throws Exception {
-        Operario cajero = operarioRepository.save(Operario.builder()
+        operarioRepository.save(Operario.builder()
                 .nombreCompleto("Cajero Test")
                 .numeroDocumento("2000000001")
                 .nombreUsuario("cajero_test")
@@ -102,7 +101,7 @@ class AuthControllerIntegrationTest {
     @Test
     @DisplayName("US-02 BDD 1: Bloqueo automático tras 3 intentos fallidos consecutivos retorna 423 AUTH-OPERARIO-BLOQUEADO")
     void testBloqueoTrasTresIntentos() throws Exception {
-        Operario cajero = operarioRepository.save(Operario.builder()
+        operarioRepository.save(Operario.builder()
                 .nombreCompleto("Cajero Bloqueo")
                 .numeroDocumento("2000000002")
                 .nombreUsuario("cajero_bloqueo")

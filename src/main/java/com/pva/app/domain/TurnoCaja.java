@@ -10,8 +10,6 @@ import java.time.LocalDateTime;
 @Table(name = "turno_caja")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 public class TurnoCaja {
 
@@ -55,4 +53,25 @@ public class TurnoCaja {
 
     @Column(name = "fecha_cierre")
     private LocalDateTime fechaCierre;
+
+    public TurnoCaja() {
+    }
+
+    public TurnoCaja(Long idTurno, Operario operario, BigDecimal baseEfectivoInicial,
+                     BigDecimal totalEfectivoVentas, BigDecimal totalDigitalVentas,
+                     BigDecimal montoFisicoArqueo, BigDecimal discrepancia,
+                     EstadoTurno estado, String observacionesCierre,
+                     LocalDateTime fechaApertura, LocalDateTime fechaCierre) {
+        this.idTurno = idTurno;
+        this.operario = operario;
+        this.baseEfectivoInicial = baseEfectivoInicial;
+        this.totalEfectivoVentas = totalEfectivoVentas;
+        this.totalDigitalVentas = totalDigitalVentas;
+        this.montoFisicoArqueo = montoFisicoArqueo;
+        this.discrepancia = discrepancia;
+        this.estado = estado;
+        this.observacionesCierre = observacionesCierre;
+        this.fechaApertura = fechaApertura;
+        this.fechaCierre = fechaCierre;
+    }
 }

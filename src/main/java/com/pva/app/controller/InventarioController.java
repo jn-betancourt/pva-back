@@ -5,7 +5,6 @@ import com.pva.app.dto.response.MovimientoInventarioResponse;
 import com.pva.app.dto.request.RegistrarCompraRequest;
 import com.pva.app.service.InventarioService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,10 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/inventario")
-@RequiredArgsConstructor
 public class InventarioController {
 
     private final InventarioService inventarioService;
+
+    public InventarioController(InventarioService inventarioService) {
+        this.inventarioService = inventarioService;
+    }
 
     @PostMapping("/compra")
     @PreAuthorize("hasRole('ADMIN')")

@@ -12,7 +12,6 @@ import com.pva.app.repository.OperarioRepository;
 import com.pva.app.domain.EstadoTurno;
 import com.pva.app.domain.TurnoCaja;
 import com.pva.app.repository.TurnoCajaRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class AuthService {
 
     private final OperarioRepository operarioRepository;
@@ -29,6 +27,18 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final TokenBlacklistService tokenBlacklistService;
+
+    public AuthService(OperarioRepository operarioRepository,
+                       TurnoCajaRepository turnoCajaRepository,
+                       PasswordEncoder passwordEncoder,
+                       JwtService jwtService,
+                       TokenBlacklistService tokenBlacklistService) {
+        this.operarioRepository = operarioRepository;
+        this.turnoCajaRepository = turnoCajaRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
+        this.tokenBlacklistService = tokenBlacklistService;
+    }
 
     @Transactional(noRollbackFor = {BadCredentialsException.class, LockedException.class})
     public LoginResponse login(LoginRequest request) {

@@ -9,8 +9,6 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "movimiento_inventario")
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 @Builder
 public class MovimientoInventario {
 
@@ -52,4 +50,24 @@ public class MovimientoInventario {
     @Column(name = "fecha_movimiento", nullable = false, updatable = false)
     @Builder.Default
     private LocalDateTime fechaMovimiento = LocalDateTime.now();
+
+    protected MovimientoInventario() {
+    }
+
+    public MovimientoInventario(Long idMovimiento, Producto producto, TipoMovimientoInventario tipoMovimiento,
+                                Integer cantidad, BigDecimal costoUnitario, BigDecimal costoTotal,
+                                Integer saldoResultante, String idReferencia, String motivoAjuste,
+                                Operario operario, LocalDateTime fechaMovimiento) {
+        this.idMovimiento = idMovimiento;
+        this.producto = producto;
+        this.tipoMovimiento = tipoMovimiento;
+        this.cantidad = cantidad;
+        this.costoUnitario = costoUnitario;
+        this.costoTotal = costoTotal;
+        this.saldoResultante = saldoResultante;
+        this.idReferencia = idReferencia;
+        this.motivoAjuste = motivoAjuste;
+        this.operario = operario;
+        this.fechaMovimiento = fechaMovimiento;
+    }
 }

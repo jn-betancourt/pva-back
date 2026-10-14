@@ -9,8 +9,6 @@ import java.math.BigDecimal;
 @Table(name = "configuracion_negocio")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 public class ConfiguracionNegocio {
 
@@ -45,4 +43,21 @@ public class ConfiguracionNegocio {
 
     @Column(name = "pie_ticket", length = 255)
     private String pieTicket;
+
+    public ConfiguracionNegocio() {
+    }
+
+    public ConfiguracionNegocio(Long idConfiguracion, Operario administrador, String nombreEstablecimiento,
+                                String nitRut, String direccion, String telefonoContacto,
+                                BigDecimal porcentajeIvaDefecto, BigDecimal descuentoMaximoCajero, String pieTicket) {
+        this.idConfiguracion = idConfiguracion;
+        this.administrador = administrador;
+        this.nombreEstablecimiento = nombreEstablecimiento;
+        this.nitRut = nitRut;
+        this.direccion = direccion;
+        this.telefonoContacto = telefonoContacto;
+        this.porcentajeIvaDefecto = porcentajeIvaDefecto;
+        this.descuentoMaximoCajero = descuentoMaximoCajero;
+        this.pieTicket = pieTicket;
+    }
 }

@@ -9,8 +9,6 @@ import java.time.LocalDateTime;
 @Table(name = "operario")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 public class Operario {
 
@@ -52,4 +50,23 @@ public class Operario {
 
     @Column(name = "actualizado_en", insertable = false, updatable = false)
     private LocalDateTime actualizadoEn;
+
+    public Operario() {
+    }
+
+    public Operario(Long idOperario, String nombreCompleto, String numeroDocumento, String telefono,
+                    String nombreUsuario, String pinHash, RolOperario rol, Boolean activo,
+                    Integer intentosFallidos, LocalDateTime creadoEn, LocalDateTime actualizadoEn) {
+        this.idOperario = idOperario;
+        this.nombreCompleto = nombreCompleto;
+        this.numeroDocumento = numeroDocumento;
+        this.telefono = telefono;
+        this.nombreUsuario = nombreUsuario;
+        this.pinHash = pinHash;
+        this.rol = rol;
+        this.activo = activo;
+        this.intentosFallidos = intentosFallidos;
+        this.creadoEn = creadoEn;
+        this.actualizadoEn = actualizadoEn;
+    }
 }

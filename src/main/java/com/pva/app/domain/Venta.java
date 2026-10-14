@@ -12,8 +12,6 @@ import java.util.List;
 @Table(name = "venta")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 public class Venta {
 
@@ -80,6 +78,34 @@ public class Venta {
 
     @OneToOne(mappedBy = "venta", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Factura factura;
+
+    public Venta() {
+    }
+
+    public Venta(Long idVenta, TurnoCaja turno, Operario operario, String uuidOffline,
+                 BigDecimal subtotal, BigDecimal descuentoGlobal, BigDecimal impuestoTotal,
+                 BigDecimal totalAPagar, MedioPago medioPago, BigDecimal montoRecibido,
+                 BigDecimal cambioEntregado, String referenciaPago, EstadoVenta estado,
+                 Boolean sincronizada, LocalDateTime fechaVenta, List<DetalleVenta> detalles,
+                 Factura factura) {
+        this.idVenta = idVenta;
+        this.turno = turno;
+        this.operario = operario;
+        this.uuidOffline = uuidOffline;
+        this.subtotal = subtotal;
+        this.descuentoGlobal = descuentoGlobal;
+        this.impuestoTotal = impuestoTotal;
+        this.totalAPagar = totalAPagar;
+        this.medioPago = medioPago;
+        this.montoRecibido = montoRecibido;
+        this.cambioEntregado = cambioEntregado;
+        this.referenciaPago = referenciaPago;
+        this.estado = estado;
+        this.sincronizada = sincronizada;
+        this.fechaVenta = fechaVenta;
+        this.detalles = detalles != null ? detalles : new ArrayList<>();
+        this.factura = factura;
+    }
 
     public void addDetalle(DetalleVenta detalle) {
         detalles.add(detalle);

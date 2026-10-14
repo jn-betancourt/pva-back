@@ -10,8 +10,6 @@ import java.time.LocalDateTime;
 @Table(name = "factura")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 public class Factura {
 
@@ -63,4 +61,26 @@ public class Factura {
     @Column(name = "fecha_emision", nullable = false)
     @Builder.Default
     private LocalDateTime fechaEmision = LocalDateTime.now();
+
+    public Factura() {
+    }
+
+    public Factura(Long idFactura, Venta venta, String numeroTicket, String clienteIdentificacion,
+                   String clienteNombre, String clienteDireccion, String clienteTelefono,
+                   BigDecimal montoTotal, BigDecimal totalImpuestos, EstadoFactura estado,
+                   String motivoAnulacion, Operario anuladaPor, LocalDateTime fechaEmision) {
+        this.idFactura = idFactura;
+        this.venta = venta;
+        this.numeroTicket = numeroTicket;
+        this.clienteIdentificacion = clienteIdentificacion;
+        this.clienteNombre = clienteNombre;
+        this.clienteDireccion = clienteDireccion;
+        this.clienteTelefono = clienteTelefono;
+        this.montoTotal = montoTotal;
+        this.totalImpuestos = totalImpuestos;
+        this.estado = estado;
+        this.motivoAnulacion = motivoAnulacion;
+        this.anuladaPor = anuladaPor;
+        this.fechaEmision = fechaEmision;
+    }
 }

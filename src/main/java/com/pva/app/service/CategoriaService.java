@@ -8,7 +8,6 @@ import com.pva.app.dto.response.InactivarCategoriaResponse;
 import com.pva.app.repository.CategoriaRepository;
 import com.pva.app.exception.ConflictException;
 import com.pva.app.exception.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,10 +15,13 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class CategoriaService {
 
     private final CategoriaRepository categoriaRepository;
+
+    public CategoriaService(CategoriaRepository categoriaRepository) {
+        this.categoriaRepository = categoriaRepository;
+    }
 
     @Transactional(readOnly = true)
     public List<CategoriaResponse> listar(Boolean activo) {

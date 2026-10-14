@@ -9,8 +9,6 @@ import java.math.BigDecimal;
 @Table(name = "detalle_venta")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 public class DetalleVenta {
 
@@ -50,4 +48,23 @@ public class DetalleVenta {
 
     @Column(name = "subtotal_linea", nullable = false, precision = 12, scale = 2)
     private BigDecimal subtotalLinea;
+
+    public DetalleVenta() {
+    }
+
+    public DetalleVenta(Long idDetalle, Venta venta, Producto producto, Integer cantidad,
+                        BigDecimal precioUnitario, BigDecimal costoUnitarioHistorico,
+                        BigDecimal descuentoLinea, BigDecimal porcentajeIva,
+                        BigDecimal impuestoLinea, BigDecimal subtotalLinea) {
+        this.idDetalle = idDetalle;
+        this.venta = venta;
+        this.producto = producto;
+        this.cantidad = cantidad;
+        this.precioUnitario = precioUnitario;
+        this.costoUnitarioHistorico = costoUnitarioHistorico;
+        this.descuentoLinea = descuentoLinea;
+        this.porcentajeIva = porcentajeIva;
+        this.impuestoLinea = impuestoLinea;
+        this.subtotalLinea = subtotalLinea;
+    }
 }

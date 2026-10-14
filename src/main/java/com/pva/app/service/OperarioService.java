@@ -10,7 +10,6 @@ import com.pva.app.repository.OperarioRepository;
 import com.pva.app.domain.EstadoTurno;
 import com.pva.app.domain.TurnoCaja;
 import com.pva.app.repository.TurnoCajaRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,12 +18,19 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class OperarioService {
 
     private final OperarioRepository operarioRepository;
     private final TurnoCajaRepository turnoCajaRepository;
     private final PasswordEncoder passwordEncoder;
+
+    public OperarioService(OperarioRepository operarioRepository,
+                          TurnoCajaRepository turnoCajaRepository,
+                          PasswordEncoder passwordEncoder) {
+        this.operarioRepository = operarioRepository;
+        this.turnoCajaRepository = turnoCajaRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Transactional(readOnly = true)
     public List<OperarioResponse> listar(Boolean activo) {

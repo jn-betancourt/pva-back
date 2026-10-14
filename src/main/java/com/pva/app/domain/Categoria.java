@@ -7,8 +7,6 @@ import lombok.*;
 @Table(name = "categoria")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 public class Categoria {
 
@@ -26,4 +24,14 @@ public class Categoria {
     @Column(name = "activo", nullable = false)
     @Builder.Default
     private Boolean activo = true;
+
+    public Categoria() {
+    }
+
+    public Categoria(Long idCategoria, String nombre, String descripcion, Boolean activo) {
+        this.idCategoria = idCategoria;
+        this.nombre = nombre;
+        this.descripcion = descripcion;
+        this.activo = activo;
+    }
 }

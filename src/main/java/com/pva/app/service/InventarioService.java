@@ -11,7 +11,6 @@ import com.pva.app.domain.Operario;
 import com.pva.app.repository.OperarioRepository;
 import com.pva.app.domain.Producto;
 import com.pva.app.repository.ProductoRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,12 +20,19 @@ import java.math.RoundingMode;
 import java.time.LocalDateTime;
 
 @Service
-@RequiredArgsConstructor
 public class InventarioService {
 
     private final ProductoRepository productoRepository;
     private final MovimientoInventarioRepository movimientoInventarioRepository;
     private final OperarioRepository operarioRepository;
+
+    public InventarioService(ProductoRepository productoRepository,
+                            MovimientoInventarioRepository movimientoInventarioRepository,
+                            OperarioRepository operarioRepository) {
+        this.productoRepository = productoRepository;
+        this.movimientoInventarioRepository = movimientoInventarioRepository;
+        this.operarioRepository = operarioRepository;
+    }
 
     @Transactional
     public MovimientoInventarioResponse registrarCompra(RegistrarCompraRequest request, Long idOperarioAdmin) {

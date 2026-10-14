@@ -10,8 +10,6 @@ import java.time.LocalDateTime;
 @Table(name = "producto")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 public class Producto {
 
@@ -69,4 +67,29 @@ public class Producto {
 
     @Column(name = "actualizado_en", insertable = false, updatable = false)
     private LocalDateTime actualizadoEn;
+
+    public Producto() {
+    }
+
+    public Producto(Long idProducto, String codigoBarras, String nombre, String descripcion,
+                    Categoria categoria, BigDecimal precioVenta, BigDecimal costoPromedio,
+                    Boolean aplicaIva, BigDecimal porcentajeIva, Integer stockActual,
+                    Integer stockMinimo, String unidadMedida, Boolean activo,
+                    LocalDateTime creadoEn, LocalDateTime actualizadoEn) {
+        this.idProducto = idProducto;
+        this.codigoBarras = codigoBarras;
+        this.nombre = nombre;
+        this.descripcion = descripcion;
+        this.categoria = categoria;
+        this.precioVenta = precioVenta;
+        this.costoPromedio = costoPromedio;
+        this.aplicaIva = aplicaIva;
+        this.porcentajeIva = porcentajeIva;
+        this.stockActual = stockActual;
+        this.stockMinimo = stockMinimo;
+        this.unidadMedida = unidadMedida;
+        this.activo = activo;
+        this.creadoEn = creadoEn;
+        this.actualizadoEn = actualizadoEn;
+    }
 }

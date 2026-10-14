@@ -4,7 +4,6 @@ import com.pva.app.dto.request.*;
 import com.pva.app.dto.response.*;
 import com.pva.app.service.OperarioService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,10 +14,13 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/operarios")
 @PreAuthorize("hasRole('ADMIN')")
-@RequiredArgsConstructor
 public class OperarioController {
 
     private final OperarioService operarioService;
+
+    public OperarioController(OperarioService operarioService) {
+        this.operarioService = operarioService;
+    }
 
     @GetMapping
     public ResponseEntity<List<OperarioResponse>> listar(

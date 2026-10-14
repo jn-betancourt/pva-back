@@ -13,7 +13,6 @@ import com.pva.app.dto.request.CerrarTurnoRequest;
 import com.pva.app.dto.response.TurnoActivoResponse;
 import com.pva.app.dto.response.TurnoResponse;
 import com.pva.app.repository.TurnoCajaRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,11 +23,16 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class TurnoCajaService {
 
     private final TurnoCajaRepository turnoCajaRepository;
     private final OperarioRepository operarioRepository;
+
+    public TurnoCajaService(TurnoCajaRepository turnoCajaRepository,
+                            OperarioRepository operarioRepository) {
+        this.turnoCajaRepository = turnoCajaRepository;
+        this.operarioRepository = operarioRepository;
+    }
 
     @Transactional(readOnly = true)
     public TurnoActivoResponse obtenerTurnoActivo(Operario operario) {
