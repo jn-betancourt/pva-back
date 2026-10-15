@@ -1,0 +1,42 @@
+$kind: http-request
+name: POST /api/v1/operarios
+url: "{{base_url}}/api/v1/operarios"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{token}}
+body:
+  type: json
+  content: |-
+    {
+      "nombre_completo": "Cajero Pruebas Automatizadas",
+      "numero_documento": "{{nuevo_doc}}",
+      "telefono": "3001234567",
+      "nombre_usuario": "{{nuevo_username}}",
+      "pin": "4321",
+      "rol": "CAJERO"
+    }
+scripts:
+  - type: beforeRequest
+    code: |-
+      const rand = Math.floor(Math.random() * 1000000);
+      pm.variables.set("nuevo_username", "cajero_" + rand);
+      pm.variables.set("nuevo_doc", "10" + rand);
+    language: text/javascript
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 201 Created", function () {
+          pm.response.to.have.status(201);
+      });
+      pm.test("Tiempo de respuesta < 1500 ms (RNF-01)", function () {
+          pm.expect(pm.response.responseTime).to.be.below(1500);
+      });
+      const jsonData = pm.response.json();
+      pm.test("Operario creado tiene id_operario y activo=true", function () {
+          pm.expect(jsonData.id_operario).to.be.a("number");
+          pm.expect(jsonData.activo).to.eql(true);
+          pm.expect(jsonData.rol).to.eql("CAJERO");
+      });
+      pm.environment.set("id_operario", jsonData.id_operario);
+    language: text/javascript
+order: 2000

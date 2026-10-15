@@ -1,0 +1,236 @@
+﻿[
+    {
+        "Modulo":  "1. Auth",
+        "Endpoint":  "POST /api/v1/auth/login",
+        "Caso":  "Admin exitoso",
+        "Esperado":  "200 (\u003c1500ms)",
+        "Obtenido":  "200 (237ms)",
+        "Estado":  "OK",
+        "Notas":  ""
+    },
+    {
+        "Modulo":  "1. Auth",
+        "Endpoint":  "POST /api/v1/auth/login",
+        "Caso":  "PIN incorrecto - 401",
+        "Esperado":  "401 (\u003c1500ms)",
+        "Obtenido":  "401 (133ms)",
+        "Estado":  "OK",
+        "Notas":  ""
+    },
+    {
+        "Modulo":  "1. Auth",
+        "Endpoint":  "POST /api/v1/auth/login",
+        "Caso":  "Operario bloqueado - 423",
+        "Esperado":  "423 (\u003c1500ms)",
+        "Obtenido":  "401 (131ms)",
+        "Estado":  "FALLA",
+        "Notas":  "Defecto: @Transactional en login hace rollback y no persiste intentos_fallidos (retorna 401 en vez de 423)"
+    },
+    {
+        "Modulo":  "1. Auth",
+        "Endpoint":  "POST /api/v1/auth/logout",
+        "Caso":  "Logout exitoso",
+        "Esperado":  "204 (\u003c1500ms)",
+        "Obtenido":  "204 (9ms)",
+        "Estado":  "OK",
+        "Notas":  ""
+    },
+    {
+        "Modulo":  "2. Operarios",
+        "Endpoint":  "GET /api/v1/operarios",
+        "Caso":  "Listar operarios",
+        "Esperado":  "200 (\u003c1500ms)",
+        "Obtenido":  "200 (22ms)",
+        "Estado":  "OK",
+        "Notas":  ""
+    },
+    {
+        "Modulo":  "2. Operarios",
+        "Endpoint":  "POST /api/v1/operarios",
+        "Caso":  "Crear operario",
+        "Esperado":  "201 (\u003c1500ms)",
+        "Obtenido":  "201 (180ms)",
+        "Estado":  "OK",
+        "Notas":  ""
+    },
+    {
+        "Modulo":  "2. Operarios",
+        "Endpoint":  "GET /api/v1/operarios/{id_operario}",
+        "Caso":  "Obtener operario por ID",
+        "Esperado":  "200 (\u003c1500ms)",
+        "Obtenido":  "200 (35ms)",
+        "Estado":  "OK",
+        "Notas":  ""
+    },
+    {
+        "Modulo":  "2. Operarios",
+        "Endpoint":  "PUT /api/v1/operarios/{id_operario}",
+        "Caso":  "Actualizar operario",
+        "Esperado":  "200 (\u003c1500ms)",
+        "Obtenido":  "200 (21ms)",
+        "Estado":  "OK",
+        "Notas":  ""
+    },
+    {
+        "Modulo":  "2. Operarios",
+        "Endpoint":  "PATCH /api/v1/operarios/{id_operario}/pin",
+        "Caso":  "Actualizar PIN",
+        "Esperado":  "200 (\u003c1500ms)",
+        "Obtenido":  "200 (169ms)",
+        "Estado":  "OK",
+        "Notas":  ""
+    },
+    {
+        "Modulo":  "2. Operarios",
+        "Endpoint":  "PATCH /api/v1/operarios/{id_operario}/desbloquear",
+        "Caso":  "Desbloquear operario",
+        "Esperado":  "200 (\u003c1500ms)",
+        "Obtenido":  "200 (17ms)",
+        "Estado":  "OK",
+        "Notas":  ""
+    },
+    {
+        "Modulo":  "2. Operarios",
+        "Endpoint":  "PATCH /api/v1/operarios/{id_operario}/inactivar",
+        "Caso":  "Inactivar operario",
+        "Esperado":  "200 (\u003c1500ms)",
+        "Obtenido":  "200 (20ms)",
+        "Estado":  "OK",
+        "Notas":  ""
+    },
+    {
+        "Modulo":  "3. Turnos de Caja",
+        "Endpoint":  "POST /api/v1/turnos/abrir",
+        "Caso":  "Abrir turno",
+        "Esperado":  "201 (\u003c1500ms)",
+        "Obtenido":  "201 (50ms)",
+        "Estado":  "OK",
+        "Notas":  ""
+    },
+    {
+        "Modulo":  "3. Turnos de Caja",
+        "Endpoint":  "GET /api/v1/turnos/activo",
+        "Caso":  "Consultar turno activo",
+        "Esperado":  "200 (\u003c1500ms)",
+        "Obtenido":  "200 (44ms)",
+        "Estado":  "OK",
+        "Notas":  ""
+    },
+    {
+        "Modulo":  "3. Turnos de Caja",
+        "Endpoint":  "GET /api/v1/turnos/{id_turno}",
+        "Caso":  "Consultar turno por ID",
+        "Esperado":  "200 (\u003c1500ms)",
+        "Obtenido":  "200 (42ms)",
+        "Estado":  "OK",
+        "Notas":  ""
+    },
+    {
+        "Modulo":  "3. Turnos de Caja",
+        "Endpoint":  "POST /api/v1/turnos/{id_turno}/cerrar",
+        "Caso":  "Cerrar turno con arqueo",
+        "Esperado":  "200 (\u003c1500ms)",
+        "Obtenido":  "200 (24ms)",
+        "Estado":  "OK",
+        "Notas":  ""
+    },
+    {
+        "Modulo":  "4. CategorÃ­as",
+        "Endpoint":  "POST /api/v1/categorias",
+        "Caso":  "Crear categorÃ­a",
+        "Esperado":  "201 (\u003c1500ms)",
+        "Obtenido":  "201 (19ms)",
+        "Estado":  "OK",
+        "Notas":  ""
+    },
+    {
+        "Modulo":  "4. CategorÃ­as",
+        "Endpoint":  "GET /api/v1/categorias",
+        "Caso":  "Listar categorÃ­as",
+        "Esperado":  "200 (\u003c1500ms)",
+        "Obtenido":  "200 (16ms)",
+        "Estado":  "OK",
+        "Notas":  ""
+    },
+    {
+        "Modulo":  "4. CategorÃ­as",
+        "Endpoint":  "PUT /api/v1/categorias/{id_categoria}",
+        "Caso":  "Actualizar categorÃ­a",
+        "Esperado":  "200 (\u003c1500ms)",
+        "Obtenido":  "200 (26ms)",
+        "Estado":  "OK",
+        "Notas":  ""
+    },
+    {
+        "Modulo":  "4. CategorÃ­as",
+        "Endpoint":  "PATCH /api/v1/categorias/{id_categoria}/inactivar",
+        "Caso":  "Inactivar categorÃ­a",
+        "Esperado":  "200 (\u003c1500ms)",
+        "Obtenido":  "200 (18ms)",
+        "Estado":  "OK",
+        "Notas":  ""
+    },
+    {
+        "Modulo":  "5. Productos",
+        "Endpoint":  "POST /api/v1/productos",
+        "Caso":  "Crear producto",
+        "Esperado":  "201 (\u003c1500ms)",
+        "Obtenido":  "201 (100ms)",
+        "Estado":  "OK",
+        "Notas":  ""
+    },
+    {
+        "Modulo":  "5. Productos",
+        "Endpoint":  "GET /api/v1/productos",
+        "Caso":  "Listar productos",
+        "Esperado":  "200 (\u003c1500ms)",
+        "Obtenido":  "200 (59ms)",
+        "Estado":  "OK",
+        "Notas":  ""
+    },
+    {
+        "Modulo":  "5. Productos",
+        "Endpoint":  "GET /api/v1/productos/{id_producto}",
+        "Caso":  "Obtener producto por ID",
+        "Esperado":  "200 (\u003c1500ms)",
+        "Obtenido":  "200 (35ms)",
+        "Estado":  "OK",
+        "Notas":  ""
+    },
+    {
+        "Modulo":  "5. Productos",
+        "Endpoint":  "GET /api/v1/productos/barcode/{codigo_barras}",
+        "Caso":  "Buscar por cÃ³digo de barras",
+        "Esperado":  "200 (\u003c1500ms)",
+        "Obtenido":  "200 (15ms)",
+        "Estado":  "OK",
+        "Notas":  ""
+    },
+    {
+        "Modulo":  "5. Productos",
+        "Endpoint":  "PUT /api/v1/productos/{id_producto}",
+        "Caso":  "Actualizar producto",
+        "Esperado":  "200 (\u003c1500ms)",
+        "Obtenido":  "200 (26ms)",
+        "Estado":  "OK",
+        "Notas":  ""
+    },
+    {
+        "Modulo":  "5. Productos",
+        "Endpoint":  "PATCH /api/v1/productos/{id_producto}/inactivar",
+        "Caso":  "Inactivar producto",
+        "Esperado":  "200 (\u003c1500ms)",
+        "Obtenido":  "200 (18ms)",
+        "Estado":  "OK",
+        "Notas":  ""
+    },
+    {
+        "Modulo":  "6. Inventario",
+        "Endpoint":  "POST /api/v1/inventario/compra",
+        "Caso":  "Abastecimiento y recÃ¡lculo de CPP",
+        "Esperado":  "201 (\u003c1500ms)",
+        "Obtenido":  "201 (28ms)",
+        "Estado":  "OK",
+        "Notas":  ""
+    }
+]

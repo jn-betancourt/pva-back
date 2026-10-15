@@ -1,0 +1,62 @@
+$kind: http-request
+name: POST /api/v1/turnos/abrir
+url: "{{base_url}}/api/v1/turnos/abrir"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{token}}
+body:
+  type: json
+  content: |-
+    {
+      "base_efectivo_inicial": 50000.00
+    }
+scripts:
+  - type: beforeRequest
+    code: |-
+      const baseUrl = pm.environment.get("base_url") || "http://localhost:8080";
+      const token = pm.environment.get("token");
+      pm.sendRequest({
+          url: baseUrl + '/api/v1/turnos/activo',
+          method: 'GET',
+          header: { 'Authorization': 'Bearer ' + token }
+      }, function (err, res) {
+          if (!err && res.code === 200) {
+              const data = res.json();
+              if (data && data.id_turno) {
+                  pm.sendRequest({
+                      url: baseUrl + '/api/v1/turnos/' + data.id_turno + '/cerrar',
+                      method: 'POST',
+                      header: {
+                          'Content-Type': 'application/json',
+                          'Authorization': 'Bearer ' + token
+                      },
+                      body: {
+                          mode: 'raw',
+                          raw: JSON.stringify({
+                              monto_fisico_arqueo: 50000.00,
+                              observaciones_cierre: "Cierre previo preventivo para apertura limpia"
+                          })
+                      }
+                  }, function () {});
+              }
+          }
+      });
+    language: text/javascript
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 201 Created", function () {
+          pm.response.to.have.status(201);
+      });
+      pm.test("Tiempo de respuesta < 1500 ms (RNF-01)", function () {
+          pm.expect(pm.response.responseTime).to.be.below(1500);
+      });
+      const jsonData = pm.response.json();
+      pm.test("Turno abierto exitosamente con estado ABIERTO", function () {
+          pm.expect(jsonData.id_turno).to.be.a("number");
+          pm.expect(jsonData.estado).to.eql("ABIERTO");
+          pm.expect(jsonData.base_efectivo_inicial).to.eql(50000.00);
+      });
+      pm.environment.set("id_turno", jsonData.id_turno);
+    language: text/javascript
+order: 1000

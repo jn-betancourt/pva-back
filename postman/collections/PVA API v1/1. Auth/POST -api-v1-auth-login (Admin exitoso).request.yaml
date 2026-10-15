@@ -1,0 +1,31 @@
+$kind: http-request
+name: POST /api/v1/auth/login (Admin exitoso)
+url: "{{base_url}}/api/v1/auth/login"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "nombre_usuario": "admin",
+      "pin": "1234"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 200", function () {
+          pm.response.to.have.status(200);
+      });
+      pm.test("Tiempo de respuesta < 1500 ms (RNF-01)", function () {
+          pm.expect(pm.response.responseTime).to.be.below(1500);
+      });
+      const jsonData = pm.response.json();
+      pm.test("Token JWT retornado con rol ADMIN", function () {
+          pm.expect(jsonData.token).to.be.a("string").and.not.empty;
+          pm.expect(jsonData.rol).to.eql("ADMIN");
+          pm.expect(jsonData.nombre_usuario).to.eql("admin");
+      });
+      pm.environment.set("token", jsonData.token);
+    language: text/javascript
+order: 1000

@@ -1,0 +1,22 @@
+$kind: http-request
+name: GET /api/v1/turnos/activo
+url: "{{base_url}}/api/v1/turnos/activo"
+method: GET
+headers:
+  Authorization: Bearer {{token}}
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 200", function () {
+          pm.response.to.have.status(200);
+      });
+      pm.test("Tiempo de respuesta < 1500 ms (RNF-01)", function () {
+          pm.expect(pm.response.responseTime).to.be.below(1500);
+      });
+      const jsonData = pm.response.json();
+      pm.test("Turno activo coincide con id_turno guardado", function () {
+          pm.expect(jsonData.id_turno).to.eql(Number(pm.environment.get("id_turno")));
+          pm.expect(jsonData.estado).to.eql("ABIERTO");
+      });
+    language: text/javascript
+order: 2000

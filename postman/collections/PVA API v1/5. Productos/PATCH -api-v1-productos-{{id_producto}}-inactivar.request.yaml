@@ -1,0 +1,55 @@
+$kind: http-request
+name: PATCH /api/v1/productos/{{id_producto}}/inactivar
+url: "{{base_url}}/api/v1/productos/{{id_producto_inactivar}}"
+method: PATCH
+headers:
+  Authorization: Bearer {{token}}
+scripts:
+  - type: beforeRequest
+    code: |-
+      const baseUrl = pm.environment.get("base_url") || "http://localhost:8080";
+      const token = pm.environment.get("token");
+      const catId = pm.environment.get("id_categoria");
+      const rand = Math.floor(Math.random() * 1000000);
+      pm.sendRequest({
+          url: baseUrl + '/api/v1/productos',
+          method: 'POST',
+          header: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + token
+          },
+          body: {
+              mode: 'raw',
+              raw: JSON.stringify({
+                  codigo_barras: "998" + String(rand).padStart(9, '0'),
+                  nombre: "Prod Inactivar " + rand,
+                  descripcion: "Para test de inactivacion",
+                  id_categoria: Number(catId),
+                  precio_venta: 2000.00,
+                  costo_inicial: 1000.00,
+                  stock_inicial: 10,
+                  aplica_iva: false,
+                  stock_minimo: 2,
+                  unidad_medida: "UNIDAD"
+              })
+          }
+      }, function (err, res) {
+          if (!err && res.code === 201) {
+              pm.variables.set("id_producto_inactivar", res.json().id_producto);
+          }
+      });
+    language: text/javascript
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 200", function () {
+          pm.response.to.have.status(200);
+      });
+      pm.test("Tiempo de respuesta < 1500 ms (RNF-01)", function () {
+          pm.expect(pm.response.responseTime).to.be.below(1500);
+      });
+      const jsonData = pm.response.json();
+      pm.test("Producto inactivado correctamente (activo=false)", function () {
+          pm.expect(jsonData.activo).to.eql(false);
+      });
+    language: text/javascript
+order: 6000

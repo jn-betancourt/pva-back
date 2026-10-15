@@ -1,0 +1,24 @@
+$kind: http-request
+name: GET /api/v1/facturas/{{id_factura}}
+url: "{{base_url}}/api/v1/facturas/{{id_factura}}"
+method: GET
+headers:
+  Authorization: Bearer {{token}}
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code is 200 OK", function () {
+          pm.response.to.have.status(200);
+      });
+      pm.test("Tiempo de respuesta < 1500 ms (RNF-01)", function () {
+          pm.expect(pm.response.responseTime).to.be.below(1500);
+      });
+      const jsonData = pm.response.json();
+      pm.test("Detalle de comprobante con items y negocio para impresión (US-15)", function () {
+          pm.expect(jsonData.id_factura).to.eql(Number(pm.environment.get("id_factura")));
+          pm.expect(jsonData.numero_ticket).to.match(/^POS-\d{6}$/);
+          pm.expect(jsonData.items).to.be.an("array");
+          pm.expect(jsonData.negocio).to.be.an("object");
+      });
+    language: text/javascript
+order: 2000
