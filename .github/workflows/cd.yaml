@@ -1,0 +1,59 @@
+name: CD
+
+on:
+  workflow_call:
+    inputs:
+      image-digest:
+        required: true
+        type: string
+        description: "Digest SHA-256 de la imagen publicada en GHCR"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      id-token: write       # Requerido para autenticacion OIDC con Azure
+      contents: read
+
+    steps:
+      - name: Normalizar nombre del repositorio a minusculas
+        run: echo "IMAGE_NAME=ghcr.io/${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
+
+      - name: Autenticacion en Azure (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Desplegar imagen por digest en Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
+          images: ${{ env.IMAGE_NAME }}@${{ inputs.image-digest }}
+
+      - name: Ejecutar Smoke Tests en produccion
+        id: smoke
+        run: |
+          echo "Iniciando verificacion de salud en Azure Web App..."
+          TARGET_URL="https://${{ secrets.AZURE_WEBAPP_NAME }}.azurewebsites.net/actuator/health"
+          echo "Endpoint objetivo: $TARGET_URL"
+          
+          for i in {1..30}; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$TARGET_URL" || true)
+            echo "Intento $i/30: codigo HTTP recibido: $STATUS"
+            if [ "$STATUS" = "200" ]; then
+              echo "Smoke test exitoso (HTTP 200). La aplicacion responde correctamente."
+              exit 0
+            fi
+            sleep 10
+          done
+
+          echo "Smoke test fallido: la aplicacion no respondio con HTTP 200 tras 300 segundos."
+          exit 1
+
+      - name: Notificar error si el despliegue o smoke test falla
+        if: failure()
+        run: |
+          echo "::error::El despliegue en Azure Web App o la prueba de humo fallaron para la imagen ${{ inputs.image-digest }}."
