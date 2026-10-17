@@ -60,8 +60,6 @@ public class SecurityConfig {
                 .cors(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/actuator/health", "/actuator/health/**").permitAll()
-                        .anyRequest().permitAll()
                         .requestMatchers("/api/v1/auth/login", "/actuator/health", "/actuator/health/**").permitAll()
                         .anyRequest().authenticated()
                 )
