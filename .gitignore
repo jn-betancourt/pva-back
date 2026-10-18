@@ -235,3 +235,4 @@ bin/
 .agents/
 .postman/
 
+.env
