@@ -10,11 +10,18 @@ on:
 jobs:
   # 1. Security (SAST + SCA en paralelo con CI)
   security:
+    permissions:
+      contents: read
+      actions: read
+      security-events: write
     uses: ./.github/workflows/security.yaml
     secrets: inherit
 
   # 2. CI (Build, Test, Empaquetado y Push a GHCR)
   ci:
+    permissions:
+      contents: read
+      packages: write
     uses: ./.github/workflows/ci.yaml
     secrets: inherit
 
@@ -22,6 +29,9 @@ jobs:
   cd:
     needs: [security, ci]
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    permissions:
+      id-token: write
+      contents: read
     uses: ./.github/workflows/cd.yaml
     with:
       image-digest: ${{ needs.ci.outputs.image-digest }}
