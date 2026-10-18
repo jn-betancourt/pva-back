@@ -14,6 +14,8 @@ RUN ./gradlew bootJar -x test --no-daemon
 
 # Etapa 2: Runtime ligero
 FROM eclipse-temurin:21-jre-alpine
+# Actualizar paquetes de Alpine para aplicar parches de seguridad (CVEs)
+RUN apk upgrade --no-cache
 WORKDIR /app
 
 # Crear usuario sin privilegios para mayor seguridad
