@@ -31,6 +31,18 @@ class CorsConfigurationIntegrationTest {
     }
 
     @Test
+    @DisplayName("Preflight OPTIONS desde Netlify permalink permitido retorna cabeceras CORS")
+    void preflightOptionsDesdeNetlifyPermalinkRetornaCabecerasCors() throws Exception {
+        mockMvc.perform(options("/api/v1/auth/login")
+                        .header("Origin", "https://6ad5940a30bf21500504f65a--pva-front.netlify.app")
+                        .header("Access-Control-Request-Method", "POST")
+                        .header("Access-Control-Request-Headers", "Content-Type,Authorization"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Access-Control-Allow-Origin", "https://6ad5940a30bf21500504f65a--pva-front.netlify.app"))
+                .andExpect(header().string("Access-Control-Allow-Credentials", "true"));
+    }
+
+    @Test
     @DisplayName("Preflight OPTIONS desde origen no permitido no incluye Access-Control-Allow-Origin")
     void preflightOptionsDesdeOrigenNoPermitidoNoRetornaCors() throws Exception {
         mockMvc.perform(options("/api/v1/auth/login")
@@ -40,3 +52,4 @@ class CorsConfigurationIntegrationTest {
                 .andExpect(header().doesNotExist("Access-Control-Allow-Origin"));
     }
 }
+

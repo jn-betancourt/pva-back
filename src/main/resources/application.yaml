@@ -30,4 +30,4 @@ management:
 
 pva:
   cors:
-    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4200,http://localhost:3000,http://localhost:5173}
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4200,http://localhost:3000,http://localhost:5173,https://6ad5940a30bf21500504f65a--pva-front.netlify.app,https://pva-front.netlify.app,https://*--pva-front.netlify.app}
