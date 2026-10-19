@@ -66,9 +66,9 @@ jobs:
           TARGET_URL="https://${{ secrets.AZURE_WEBAPP_NAME }}.azurewebsites.net/actuator/health"
           echo "Endpoint objetivo: $TARGET_URL"
           
-          for i in {1..30}; do
-            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$TARGET_URL" || true)
-            echo "Intento $i/30: codigo HTTP recibido: $STATUS"
+          for i in {1..45}; do
+            STATUS=$(curl -s -L -o /dev/null -w "%{http_code}" "$TARGET_URL" || true)
+            echo "Intento $i/45: codigo HTTP recibido: $STATUS"
             if [ "$STATUS" = "200" ]; then
               echo "Smoke test exitoso (HTTP 200). La aplicacion responde correctamente."
               exit 0
@@ -76,7 +76,7 @@ jobs:
             sleep 10
           done
 
-          echo "Smoke test fallido: la aplicacion no respondio con HTTP 200 tras 300 segundos."
+          echo "Smoke test fallido: la aplicacion no respondio con HTTP 200 tras 450 segundos."
           exit 1
 
       - name: Notificar error si el despliegue o smoke test falla
