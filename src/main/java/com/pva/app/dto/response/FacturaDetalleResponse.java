@@ -63,20 +63,25 @@ public record FacturaDetalleResponse(
     ) {}
 
     public static FacturaDetalleResponse fromEntity(Factura f, ConfiguracionNegocio config) {
-        List<Item> items = f.getVenta().getDetalles().stream()
+        List<Item> items = (f.getVenta() != null && f.getVenta().getDetalles() != null)
+                ? f.getVenta().getDetalles().stream()
                 .map(d -> new Item(
-                        d.getProducto().getNombre(),
+                        d.getProducto() != null ? d.getProducto().getNombre() : "Producto sin nombre",
                         d.getCantidad(),
                         d.getPrecioUnitario(),
                         d.getDescuentoLinea(),
                         d.getPorcentajeIva(),
                         d.getImpuestoLinea(),
                         d.getSubtotalLinea()))
-                .toList();
+                .toList()
+                : List.of();
+
+        Long idVenta = f.getVenta() != null ? f.getVenta().getIdVenta() : null;
+
         return new FacturaDetalleResponse(
                 f.getIdFactura(),
                 f.getNumeroTicket(),
-                f.getVenta().getIdVenta(),
+                idVenta,
                 f.getClienteIdentificacion(),
                 f.getClienteNombre(),
                 f.getClienteDireccion(),

@@ -4,6 +4,8 @@ import com.pva.app.exception.AppException;
 import com.pva.app.exception.EntityNotFoundException;
 import com.pva.app.domain.MovimientoInventario;
 import com.pva.app.domain.TipoMovimientoInventario;
+import com.pva.app.dto.response.AlertaStockResponse;
+import com.pva.app.dto.response.KardexResponse;
 import com.pva.app.dto.response.MovimientoInventarioResponse;
 import com.pva.app.dto.request.RegistrarCompraRequest;
 import com.pva.app.repository.MovimientoInventarioRepository;
@@ -20,8 +22,12 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -188,5 +194,53 @@ class InventarioServiceTest {
 
         verify(movimientoInventarioRepository, never()).save(any());
     }
-}
 
+    @Test
+    @DisplayName("Obtener Kardex exitoso con movimientos y filtros")
+    void testObtenerKardexExitoso() {
+        when(productoRepository.findById(50L)).thenReturn(Optional.of(producto));
+        MovimientoInventario mov = MovimientoInventario.builder()
+                .idMovimiento(1L)
+                .producto(producto)
+                .tipoMovimiento(TipoMovimientoInventario.COMPRA)
+                .cantidad(10)
+                .costoUnitario(new BigDecimal("1500.00"))
+                .costoTotal(new BigDecimal("15000.00"))
+                .saldoResultante(20)
+                .operario(adminOperario)
+                .fechaMovimiento(LocalDateTime.now())
+                .build();
+        when(movimientoInventarioRepository.findAll(any(Specification.class), any(Sort.class)))
+                .thenReturn(List.of(mov));
+
+        KardexResponse res = inventarioService.obtenerKardex(
+                50L, LocalDateTime.now().minusDays(5), LocalDateTime.now(), TipoMovimientoInventario.COMPRA);
+
+        assertThat(res).isNotNull();
+        assertThat(res.idProducto()).isEqualTo(50L);
+        assertThat(res.movimientos()).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("Obtener Kardex con rango de fechas invalido lanza excepcion")
+    void testObtenerKardexRangoInvalido() {
+        when(productoRepository.findById(50L)).thenReturn(Optional.of(producto));
+        LocalDateTime desde = LocalDateTime.now();
+        LocalDateTime hasta = desde.minusDays(1);
+
+        assertThatThrownBy(() -> inventarioService.obtenerKardex(50L, desde, hasta, null))
+                .isInstanceOf(AppException.class)
+                .hasMessageContaining("El rango de fechas es invalido");
+    }
+
+    @Test
+    @DisplayName("Listar alertas de stock bajo retorna lista mapeada")
+    void testListarAlertas() {
+        when(productoRepository.findAlertasStock()).thenReturn(List.of(producto));
+
+        List<AlertaStockResponse> alertas = inventarioService.listarAlertas();
+
+        assertThat(alertas).hasSize(1);
+        assertThat(alertas.get(0).idProducto()).isEqualTo(50L);
+    }
+}

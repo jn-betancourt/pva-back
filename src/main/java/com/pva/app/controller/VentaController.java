@@ -7,8 +7,8 @@ import com.pva.app.dto.request.CrearVentaRequest;
 import com.pva.app.dto.response.AnulacionVentaResponse;
 import com.pva.app.dto.response.VentaResponse;
 import com.pva.app.dto.response.VentaResumenResponse;
-import com.pva.app.exception.AppException;
 import com.pva.app.service.VentaService;
+import com.pva.app.util.SecurityUtils;
 import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -42,7 +42,7 @@ public class VentaController {
     public ResponseEntity<VentaResponse> crearVenta(
             @Valid @RequestBody CrearVentaRequest request,
             Authentication authentication) {
-        Long idOperario = extraerIdOperario(authentication);
+        Long idOperario = SecurityUtils.extraerIdOperario(authentication);
         return ResponseEntity.status(HttpStatus.CREATED).body(ventaService.crearVenta(request, idOperario));
     }
 
@@ -56,7 +56,7 @@ public class VentaController {
             @RequestParam(value = "estado", required = false) EstadoVenta estado,
             @RequestParam(value = "medio_pago", required = false) MedioPago medioPago,
             Authentication authentication) {
-        Long idOperario = extraerIdOperario(authentication);
+        Long idOperario = SecurityUtils.extraerIdOperario(authentication);
         return ResponseEntity.ok(ventaService.listar(idOperario, idTurno, desde, hasta, estado, medioPago));
     }
 
@@ -64,7 +64,7 @@ public class VentaController {
     public ResponseEntity<VentaResponse> obtenerPorId(
             @PathVariable("id_venta") Long idVenta,
             Authentication authentication) {
-        Long idOperario = extraerIdOperario(authentication);
+        Long idOperario = SecurityUtils.extraerIdOperario(authentication);
         return ResponseEntity.ok(ventaService.obtenerPorId(idVenta, idOperario));
     }
 
@@ -74,25 +74,7 @@ public class VentaController {
             @PathVariable("id_venta") Long idVenta,
             @Valid @RequestBody AnularVentaRequest request,
             Authentication authentication) {
-        Long idOperario = extraerIdOperario(authentication);
+        Long idOperario = SecurityUtils.extraerIdOperario(authentication);
         return ResponseEntity.ok(ventaService.anularVenta(idVenta, request, idOperario));
-    }
-
-    private Long extraerIdOperario(Authentication authentication) {
-        if (authentication == null || authentication.getPrincipal() == null) {
-            throw new AppException("Token inválido o expirado", HttpStatus.UNAUTHORIZED, "AUTH-TOKEN-INVALIDO");
-        }
-        Object principal = authentication.getPrincipal();
-        if (principal instanceof Long id) {
-            return id;
-        }
-        if (principal instanceof String str) {
-            try {
-                return Long.parseLong(str);
-            } catch (NumberFormatException e) {
-                throw new AppException("Token inválido o expirado", HttpStatus.UNAUTHORIZED, "AUTH-TOKEN-INVALIDO");
-            }
-        }
-        throw new AppException("Token inválido o expirado", HttpStatus.UNAUTHORIZED, "AUTH-TOKEN-INVALIDO");
     }
 }

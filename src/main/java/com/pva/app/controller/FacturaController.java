@@ -3,10 +3,9 @@ package com.pva.app.controller;
 import com.pva.app.domain.EstadoFactura;
 import com.pva.app.dto.response.FacturaDetalleResponse;
 import com.pva.app.dto.response.FacturaResumenResponse;
-import com.pva.app.exception.AppException;
 import com.pva.app.service.FacturaService;
+import com.pva.app.util.SecurityUtils;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -40,7 +39,7 @@ public class FacturaController {
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime hasta,
             @RequestParam(value = "estado", required = false) EstadoFactura estado,
             Authentication authentication) {
-        Long idOperario = extraerIdOperario(authentication);
+        Long idOperario = SecurityUtils.extraerIdOperario(authentication);
         return ResponseEntity.ok(
                 facturaService.listar(idOperario, numeroTicket, clienteIdentificacion, desde, hasta, estado));
     }
@@ -49,25 +48,7 @@ public class FacturaController {
     public ResponseEntity<FacturaDetalleResponse> obtenerPorId(
             @PathVariable("id_factura") Long idFactura,
             Authentication authentication) {
-        Long idOperario = extraerIdOperario(authentication);
+        Long idOperario = SecurityUtils.extraerIdOperario(authentication);
         return ResponseEntity.ok(facturaService.obtenerPorId(idFactura, idOperario));
-    }
-
-    private Long extraerIdOperario(Authentication authentication) {
-        if (authentication == null || authentication.getPrincipal() == null) {
-            throw new AppException("Token inválido o expirado", HttpStatus.UNAUTHORIZED, "AUTH-TOKEN-INVALIDO");
-        }
-        Object principal = authentication.getPrincipal();
-        if (principal instanceof Long id) {
-            return id;
-        }
-        if (principal instanceof String str) {
-            try {
-                return Long.parseLong(str);
-            } catch (NumberFormatException e) {
-                throw new AppException("Token inválido o expirado", HttpStatus.UNAUTHORIZED, "AUTH-TOKEN-INVALIDO");
-            }
-        }
-        throw new AppException("Token inválido o expirado", HttpStatus.UNAUTHORIZED, "AUTH-TOKEN-INVALIDO");
     }
 }

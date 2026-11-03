@@ -1,9 +1,13 @@
 package com.pva.app.controller;
 
-import com.pva.app.exception.AppException;
-import com.pva.app.dto.request.*;
-import com.pva.app.dto.response.*;
+import com.pva.app.dto.request.ActualizarProductoRequest;
+import com.pva.app.dto.request.CrearProductoRequest;
+import com.pva.app.dto.response.CrearProductoResponse;
+import com.pva.app.dto.response.InactivarProductoResponse;
+import com.pva.app.dto.response.ProductoBarcodeResponse;
+import com.pva.app.dto.response.ProductoResponse;
 import com.pva.app.service.ProductoService;
+import com.pva.app.util.SecurityUtils;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +32,7 @@ public class ProductoController {
     public ResponseEntity<CrearProductoResponse> crear(
             @Valid @RequestBody CrearProductoRequest request,
             Authentication authentication) {
-        Long idOperario = extraerIdOperario(authentication);
+        Long idOperario = SecurityUtils.extraerIdOperario(authentication);
         CrearProductoResponse response = productoService.crear(request, idOperario);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -62,7 +66,7 @@ public class ProductoController {
     @PreAuthorize("hasAnyRole('CAJERO', 'ADMIN')")
     public ResponseEntity<List<ProductoResponse>> listar(
             @RequestParam(name = "id_categoria", required = false) Long idCategoria,
-            @RequestParam(name = "activo", required = false, defaultValue = "true") Boolean activo,
+            @RequestParam(name = "activo", required = false) Boolean activo,
             @RequestParam(name = "stock_bajo", required = false) Boolean stockBajo,
             @RequestParam(name = "q", required = false) String q) {
         List<ProductoResponse> response = productoService.listar(idCategoria, activo, stockBajo, q);
@@ -75,23 +79,5 @@ public class ProductoController {
             @PathVariable("codigo_barras") String codigoBarras) {
         ProductoBarcodeResponse response = productoService.buscarPorBarcode(codigoBarras);
         return ResponseEntity.ok(response);
-    }
-
-    private Long extraerIdOperario(Authentication authentication) {
-        if (authentication == null || authentication.getPrincipal() == null) {
-            throw new AppException("Token inválido o expirado", HttpStatus.UNAUTHORIZED, "AUTH-TOKEN-INVALIDO");
-        }
-        Object principal = authentication.getPrincipal();
-        if (principal instanceof Long id) {
-            return id;
-        }
-        if (principal instanceof String str) {
-            try {
-                return Long.parseLong(str);
-            } catch (NumberFormatException e) {
-                throw new AppException("Token inválido o expirado", HttpStatus.UNAUTHORIZED, "AUTH-TOKEN-INVALIDO");
-            }
-        }
-        throw new AppException("Token inválido o expirado", HttpStatus.UNAUTHORIZED, "AUTH-TOKEN-INVALIDO");
     }
 }

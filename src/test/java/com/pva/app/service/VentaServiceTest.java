@@ -16,7 +16,9 @@ import com.pva.app.dto.request.AnularVentaRequest;
 import com.pva.app.dto.request.CrearVentaRequest;
 import com.pva.app.dto.response.AnulacionVentaResponse;
 import com.pva.app.dto.response.VentaResponse;
+import com.pva.app.dto.response.VentaResumenResponse;
 import com.pva.app.exception.AppException;
+import com.pva.app.exception.EntityNotFoundException;
 import com.pva.app.repository.ConfiguracionNegocioRepository;
 import com.pva.app.repository.FacturaRepository;
 import com.pva.app.repository.MovimientoInventarioRepository;
@@ -32,8 +34,11 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -353,5 +358,70 @@ class VentaServiceTest {
                 .montoTotal(new BigDecimal("10140.00")).build();
         venta.setFactura(factura);
         return venta;
+    }
+
+    @Test
+    @DisplayName("Listar ventas como ADMIN retorna resumen correctamente")
+    void testListarVentasComoAdmin() {
+        when(operarioRepository.findById(1L)).thenReturn(Optional.of(admin));
+        Venta v = ventaConFactura();
+        when(ventaRepository.findAll(any(Specification.class), any(Sort.class))).thenReturn(List.of(v));
+
+        List<VentaResumenResponse> resultado = ventaService.listar(
+                1L, 10L, LocalDateTime.now().minusDays(1), LocalDateTime.now().plusDays(1),
+                EstadoVenta.CONFIRMADA, MedioPago.EFECTIVO);
+
+        assertThat(resultado).hasSize(1);
+        assertThat(resultado.get(0).numeroTicket()).isEqualTo("POS-000104");
+    }
+
+    @Test
+    @DisplayName("Listar ventas con rango de fechas inválido lanza excepción")
+    void testListarVentasRangoInvalido() {
+        when(operarioRepository.findById(1L)).thenReturn(Optional.of(admin));
+        LocalDateTime desde = LocalDateTime.now();
+        LocalDateTime hasta = desde.minusDays(1);
+
+        assertThatThrownBy(() -> ventaService.listar(1L, null, desde, hasta, null, null))
+                .isInstanceOf(AppException.class)
+                .hasMessageContaining("El rango de fechas es invalido");
+    }
+
+    @Test
+    @DisplayName("Obtener venta por ID como ADMIN o dueño es exitoso")
+    void testObtenerVentaPorIdExitoso() {
+        when(operarioRepository.findById(1L)).thenReturn(Optional.of(admin));
+        Venta v = ventaConFactura();
+        when(ventaRepository.findById(100L)).thenReturn(Optional.of(v));
+
+        VentaResponse response = ventaService.obtenerPorId(100L, 1L);
+
+        assertThat(response).isNotNull();
+        assertThat(response.idVenta()).isEqualTo(100L);
+    }
+
+    @Test
+    @DisplayName("Obtener venta por ID de otro operario siendo CAJERO deniega acceso")
+    void testObtenerVentaPorIdDenegado() {
+        Operario otroCajero = Operario.builder()
+                .idOperario(9L).rol(RolOperario.CAJERO).nombreUsuario("otro").build();
+        when(operarioRepository.findById(9L)).thenReturn(Optional.of(otroCajero));
+        Venta v = ventaConFactura();
+        when(ventaRepository.findById(100L)).thenReturn(Optional.of(v));
+
+        assertThatThrownBy(() -> ventaService.obtenerPorId(100L, 9L))
+                .isInstanceOf(AppException.class)
+                .hasMessageContaining("Acceso denegado");
+    }
+
+    @Test
+    @DisplayName("Obtener venta por ID inexistente lanza EntityNotFoundException")
+    void testObtenerVentaPorIdNoEncontrada() {
+        when(operarioRepository.findById(1L)).thenReturn(Optional.of(admin));
+        when(ventaRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> ventaService.obtenerPorId(999L, 1L))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessageContaining("Venta no encontrada");
     }
 }

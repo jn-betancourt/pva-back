@@ -417,13 +417,13 @@ public class VentaService {
 
         // Se descuenta del turno de la venta solo si sigue abierto; un turno cerrado conserva su arqueo.
         TurnoCaja turno = venta.getTurno();
-        if (turno.getEstado() == EstadoTurno.ABIERTO) {
+        if (turno != null && turno.getEstado() == EstadoTurno.ABIERTO) {
             if (venta.getMedioPago() == MedioPago.EFECTIVO) {
-                turno.setTotalEfectivoVentas(
-                        turno.getTotalEfectivoVentas().subtract(venta.getTotalAPagar()).max(BigDecimal.ZERO));
+                BigDecimal actual = turno.getTotalEfectivoVentas() != null ? turno.getTotalEfectivoVentas() : BigDecimal.ZERO;
+                turno.setTotalEfectivoVentas(actual.subtract(venta.getTotalAPagar()).max(BigDecimal.ZERO));
             } else {
-                turno.setTotalDigitalVentas(
-                        turno.getTotalDigitalVentas().subtract(venta.getTotalAPagar()).max(BigDecimal.ZERO));
+                BigDecimal actual = turno.getTotalDigitalVentas() != null ? turno.getTotalDigitalVentas() : BigDecimal.ZERO;
+                turno.setTotalDigitalVentas(actual.subtract(venta.getTotalAPagar()).max(BigDecimal.ZERO));
             }
             turnoCajaRepository.save(turno);
         }
@@ -456,6 +456,9 @@ public class VentaService {
             return;
         }
         BigDecimal maximo = config.get().getDescuentoMaximoCajero();
+        if (maximo == null) {
+            return;
+        }
         BigDecimal porcentaje = descuentoTotal.multiply(CIEN).divide(bruto, 2, RoundingMode.HALF_UP);
         if (porcentaje.compareTo(maximo) > 0) {
             throw new AppException(
