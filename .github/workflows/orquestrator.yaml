@@ -1,0 +1,28 @@
+name: Orquestador
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  # 1. Security (SAST + SCA en paralelo con CI)
+  security:
+    uses: ./.github/workflows/security.yaml
+    secrets: inherit
+
+  # 2. CI (Build, Test, Empaquetado y Push a GHCR)
+  ci:
+    uses: ./.github/workflows/ci.yaml
+    secrets: inherit
+
+  # 3. CD (Deploy directo a Azure y Smoke Test)
+  cd:
+    needs: [security, ci]
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    uses: ./.github/workflows/cd.yaml
+    with:
+      image-digest: ${{ needs.ci.outputs.image-digest }}
+    secrets: inherit

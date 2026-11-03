@@ -253,4 +253,31 @@ class EntityPersistenceTests {
         assertThat(buscada.get().getClienteNombre()).isEqualTo("CONSUMIDOR FINAL");
         assertThat(buscada.get().getVenta().getIdVenta()).isEqualTo(venta.getIdVenta());
     }
+
+    @Test
+    @DisplayName("Debe bloquear pesimistamente Producto con findByIdForUpdate")
+    void testBloqueoPesimistaProducto() {
+        Categoria cat = categoriaRepository.save(Categoria.builder()
+                .nombre("Lácteos Test Lock")
+                .activo(true)
+                .build());
+
+        Producto prod = productoRepository.save(Producto.builder()
+                .codigoBarras("7709876543299")
+                .nombre("Leche Entera 1L Lock")
+                .categoria(cat)
+                .precioVenta(new BigDecimal("4000.00"))
+                .costoPromedio(new BigDecimal("2800.00"))
+                .aplicaIva(false)
+                .porcentajeIva(BigDecimal.ZERO)
+                .stockActual(15)
+                .stockMinimo(3)
+                .unidadMedida("UNIDAD")
+                .activo(true)
+                .build());
+
+        Optional<Producto> bloqueado = productoRepository.findByIdForUpdate(prod.getIdProducto());
+        assertThat(bloqueado).isPresent();
+        assertThat(bloqueado.get().getIdProducto()).isEqualTo(prod.getIdProducto());
+    }
 }
